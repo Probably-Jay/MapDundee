@@ -11,13 +11,15 @@ public class MoveTo : MonoBehaviour
     [SerializeField] private Vector2 offset;
 
     [SerializeField] private bool b = true;
-    
+
+    [SerializeField, TextArea(1,3)] private string foo;
     
     void Update()
     {
-        var geoCordFromUs = new GeoCord(offset);
+        var geoCordFromUs = new GeoCord(offset.x, offset.y);
 
        // transform.position =  geoCordFromUs.ToWorldSpace();
-       transform.position =  GeoCord.GeoCordToWorldSpace(geoCordFromUs);
+       var pos = GeoCord.GeoCordToWorldSpace(geoCordFromUs, b);
+       transform.position =  new Vector3(pos.x, pos.y, 0);
     }
 }

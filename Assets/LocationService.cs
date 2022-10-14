@@ -1,121 +1,161 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using CustomTools;
 using SingletonT;
 using UnityEngine;
+
+[Serializable]
+public struct DoubleVec
+{
+   public DoubleVec(double x, double y)
+   {
+      this.x = x;
+      this.y = y;
+   }
+   public double x;
+   public double y;
+}
+
+[Serializable]
+public struct SceneWorldTie
+{
+   public DoubleVec scenePosition;
+   public GeoCord GeoCord;
+}
+
 
 public class LocationService : Singleton<LocationService>
 {
    public new static LocationService Instance => Singleton<LocationService>.Instance;
 
-   public readonly GeoCord Offset = GeoCord.FromLocationService(new Vector2(-2.965212f, 56.462334f));
+ //  public readonly GeoCord Offset = GeoCord.FromLocationService(new Vector2(-2.965212f, 56.462334f));
 
-   public Vector2 pixelOffset;
-   public float mapScale;
-   
+  // public Vector2 pixelOffset;
+  //   public float mapScale;
+
+  public SceneWorldTie topLeft;// = new() {scenePosition = {x = -4055, y =1439 }, GeoCord = new GeoCord(longitude: -3.0728734194401204, latitude: 56.48873568677126)};
+   public SceneWorldTie bottomRight;// = new() {scenePosition = {x = 2989, y =-2039 }, GeoCord = new GeoCord(longitude: -2.918578798326768, latitude: 56.44756222755063)};
+
    /*
     * y Latitude: 1 deg = 110_574 m 
     * x Longitude: 1 deg = 111_320*cos(latitude) m 
     */
    
-   public GeoCord? CurrentLocation
-   {
-      get
-      {
-         if (Input.location.status != LocationServiceStatus.Running)
-         {
-            return null;
-         }
-
-         var x = Input.location.lastData.latitude;
-         var y = Input.location.lastData.longitude;
-         var location = new Vector2(x, y);
-
-         return GeoCord.FromLocationService(location - Offset.AsVector);
-      }
-   }
+   // public GeoCord? CurrentLocation
+   // {
+   //    get
+   //    {
+   //       if (Input.location.status != LocationServiceStatus.Running)
+   //       {
+   //          return null;
+   //       }
+   //
+   //       var x = Input.location.lastData.latitude;
+   //       var y = Input.location.lastData.longitude;
+   //       var location = new Vector2(x, y);
+   //
+   //       return GeoCord.FromLocationService(location - Offset.AsVector);
+   //    }
+   // }
 }
 
 
 
-
-public readonly struct GeoCord
+[Serializable]
+public struct GeoCord
 {
 
-   public static GeoCord FromLocationService(Vector2 v) => new(v);
+  // public static GeoCord FromLocationService(Vector2 v) => new(v);
 
-   public GeoCord(Vector2 v): this(longitude: v.x, latitude: v.y)
+   public GeoCord(DoubleVec v): this(longitude: v.x, latitude: v.y)
    {
    }
 
-   public GeoCord(float longitude, float latitude) 
+   public GeoCord(double longitude, double latitude) 
    {  Longitude = longitude;
       Latitude = latitude;
    }
 
 
-   public static implicit operator GeoCord(Vector2 v) => new(v);
+  // public static implicit operator GeoCord(Vector2 v) => new(v);
 
-   public static implicit operator Vector2(GeoCord g) => g.AsVector;
+ //  public static implicit operator Vector2(GeoCord g) => g.AsVector;
 
-   public float Longitude { get; }
+   [field: SerializeField] public double Longitude { get; private set; }
 
-   public float Latitude { get; }
+   [field: SerializeField] public double Latitude { get; private set; }
 
-   public Vector2 AsVector => new(Longitude, Latitude);
+ //  public Vector2 AsVector => new(Longitude, Latitude);
    
-   //p0
-   private static (Vector2 scene, GeoCord geoCord) topLeft = new (new Vector2(0f, 1250f), new GeoCord(-2.9973157131792667f, 56.468069672214014f));
+ //  private static (Vector2 scene, GeoCord geoCord) topLeft = new (new Vector2(0f, 1250f), new GeoCord(-2.9973157131792667f, 56.468069672214014f));
    
-   // p1
-   private static (Vector2 scene, GeoCord geoCord) bottomRight = new (new Vector2(2500f, 0f), new GeoCord(-2.957536501757597f, 56.456901948333f));
+ //  private static (Vector2 scene, GeoCord geoCord) bottomRight = new (new Vector2(2500f, 0f), new GeoCord(-2.957536501757597f, 56.456901948333f));
    
-   private static float earthRadiusInKm= 6371;      //Earth Radius in Km
+   //private static double earthRadiusInKm= 6371;
+   private static double earthRadiusInKm= 2.0*6371;
 
-//## Now I can calculate the global X and Y for each reference point ##\\
-
-// This function converts lat and lng coordinates to GLOBAL X and Y positions
-static Vector2 GeoCordToGlobalXY(GeoCord geoCord)
+   DoubleVec GeoCordToGlobalXY()
    {
-      //Calculates x based on cos of average of the latitudes
-      var x = earthRadiusInKm * geoCord.Longitude* Mathf.Cos((topLeft.geoCord.Latitude + bottomRight.geoCord.Latitude) / 2f);
-      //Calculates y based on latitude
-      var y = earthRadiusInKm * geoCord.Latitude;
-      return new Vector2(x, y);
+      var topLeftLatitude = LocationService.Instance.topLeft.GeoCord.Latitude;
+      var bottomRightLatitude = LocationService.Instance.bottomRight.GeoCord.Latitude;
+      var averageLatitude = (topLeftLatitude + bottomRightLatitude) / 2.0;
+
+      var latitudeScaleFactor = Math.Cos((3.1415926535_8979323846_2643383279/180.0) * averageLatitude); // = ~0.5
+      
+      var x = earthRadiusInKm * Longitude * latitudeScaleFactor;
+      var y = earthRadiusInKm * Latitude;
+      
+      return new DoubleVec(x, y);
    }
 
-public static Vector2 GeoCordToWorldSpace(GeoCord geoCord)
+
+   public static Vector2 GeoCordToWorldSpace(GeoCord geoCord, bool b)
    {
-      /*
-* This gives me the X and Y in relation to map for the 2 reference points.
-* Now we have the global AND screen areas and then we can relate both for the projection point.
-*/
-
-         
-      // Calculate global X and Y for top-left reference point
-      Vector2 globalTopLeft = GeoCordToGlobalXY(topLeft.geoCord);
-      // Calculate global X and Y for bottom-right reference point
-      Vector2 globalBottomRight = GeoCordToGlobalXY(bottomRight.geoCord);
-      
-      //Calculate global X and Y for projection point
-      var globalXY = GeoCordToGlobalXY(geoCord);
-
-      Vector2 lerpVals;
-      
-      //Calculate the percentage of Global X position in relation to total global width
-      lerpVals.x = ((globalXY.x - globalTopLeft.x)/(globalBottomRight.x - globalTopLeft.x));
-      
-      //Calculate the percentage of Global Y position in relation to total global height
-      lerpVals.y = ((globalXY.y - globalTopLeft.y)/(globalBottomRight.y - globalTopLeft.y));
-
-      //Returns the screen position based on reference points
-      
-      var x = Mathf.Lerp(topLeft.scene.x, bottomRight.scene.x, lerpVals.x);
-      var y = Mathf.Lerp(topLeft.scene.y, bottomRight.scene.y, lerpVals.y);
-
-      return new Vector2(x, y);
+      return b switch
+      {
+         true => GeoCordToWorldSpaceAAA(geoCord),
+         false => GeoCordToWorldSpaceBBB(geoCord)
+      };
    }
 
+   public static Vector2 GeoCordToWorldSpaceAAA(GeoCord geoCord)
+   {
+      
+      var globalXY = geoCord.GeoCordToGlobalXY();
+      var globalTopLeft = LocationService.Instance.topLeft.GeoCord.GeoCordToGlobalXY();
+      var globalBottomRight = LocationService.Instance.bottomRight.GeoCord.GeoCordToGlobalXY();
+
+      DoubleVec lerpVals;
+
+      lerpVals.x = InverseLerpUnclamped(globalTopLeft.x, globalBottomRight.x, globalXY.x);
+      lerpVals.y = InverseLerpUnclamped(globalTopLeft.y, globalBottomRight.y, globalXY.y);
+
+      var x = LerpUnclamped(LocationService.Instance.topLeft.scenePosition.x, LocationService.Instance.bottomRight.scenePosition.x, lerpVals.x);
+      var y = LerpUnclamped(LocationService.Instance.topLeft.scenePosition.y, LocationService.Instance.bottomRight.scenePosition.y, lerpVals.y);
+
+      return new Vector2((float)x, (float)y);
+   }
+
+   public static Vector2 GeoCordToWorldSpaceBBB(GeoCord geoCord)
+   {
+      
+      var topLeft = LocationService.Instance.topLeft.GeoCord;
+      var bottomRight = LocationService.Instance.bottomRight.GeoCord;
+      
+      DoubleVec lerpVals;
+
+      lerpVals.x = InverseLerpUnclamped(topLeft.Longitude, bottomRight.Longitude, geoCord.Longitude);
+      lerpVals.y = InverseLerpUnclamped(topLeft.Latitude, bottomRight.Latitude, geoCord.Latitude);
+
+      var x = LerpUnclamped(LocationService.Instance.topLeft.scenePosition.x, LocationService.Instance.bottomRight.scenePosition.x, lerpVals.x);
+      var y = LerpUnclamped(LocationService.Instance.topLeft.scenePosition.y, LocationService.Instance.bottomRight.scenePosition.y, lerpVals.y);
+
+      return new Vector2((float)x, (float)y);
+   }
+
+   public static double LerpUnclamped(double a, double b, double t) => a + (b - a) * t;
+public static double InverseLerpUnclamped(double a, double b, double value) => Math.Abs(a - b) > double.Epsilon ? (value - a) / (b - a) : 0.0;
 
 
 

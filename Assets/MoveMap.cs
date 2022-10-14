@@ -7,7 +7,7 @@ public class MoveMap : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        var playerPosition = LocationService.Instance.CurrentLocation;
+      //  var playerPosition = LocationService.Instance.CurrentLocation;
         
         
     }
