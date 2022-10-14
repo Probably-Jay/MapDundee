@@ -15,10 +15,9 @@ public class MoveTo : MonoBehaviour
     
     void Update()
     {
-        GeoCord geoCordFromUs = new GeoCord(offset);
+        var geoCordFromUs = new GeoCord(offset);
 
-        transform.position =  geoCordFromUs.ToWorldSpace(b);
-        
-        transform.parent
+       // transform.position =  geoCordFromUs.ToWorldSpace();
+       transform.position =  GeoCord.GeoCordToWorldSpace(geoCordFromUs);
     }
 }

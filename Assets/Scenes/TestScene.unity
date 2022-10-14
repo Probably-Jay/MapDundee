@@ -525,6 +525,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 468a384539dfcb642bf72ca1dd7576e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pixelOffset: {x: 1000, y: 1000}
 --- !u!1 &699058678
 GameObject:
   m_ObjectHideFlags: 0
@@ -542,7 +543,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &699058679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -787,7 +788,7 @@ SpriteRenderer:
   m_Size: {x: 39.65, y: 29.389015}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &1003986404
