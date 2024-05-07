@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 818ec82713efa4ba491e9bd91756281a
+timeCreated: 1488835365
+licenseType: Store
+TextScriptImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 78642
+  packageName: Google Go Maps - For Location-based Games
+  packageVersion: 1.1
+  assetPath: Assets/GoogleGoMap/Instructions.txt
+  uploadId: 168379

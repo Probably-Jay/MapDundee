@@ -7,8 +7,9 @@ using UnityEngine;
 
 public class MoveTo : MonoBehaviour
 {
-
     [SerializeField] private Vector2 offset;
+    [SerializeField] private double xOffset;
+    [SerializeField] private double yOffset;
 
     [SerializeField] private bool b = true;
 
@@ -16,13 +17,13 @@ public class MoveTo : MonoBehaviour
     
     void Update()
     {
-        var geoCordFromUs = new GeoCord(offset.x, offset.y);
+        //var geoCordFromUs = new GeoCord(offset.x, offset.y);
 
         // transform.position =  geoCordFromUs.ToWorldSpace();
 
-        var pos = GPSEncoder.GPSToUCS(offset);
+        var pos = GPSEncoder.GPSToUCS(xOffset, yOffset);
 
        //var pos = GeoCord.GeoCordToWorldSpace(geoCordFromUs, b);
-       transform.position =  new Vector3(pos.x, pos.y, 0);
+       transform.position =  new Vector3((float)pos.x, (float)pos.y, 0);
     }
 }

@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 39ed620bcb33142e7a0f07f732bc3bc7
+timeCreated: 1469040908
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 78642
+  packageName: Google Go Maps - For Location-based Games
+  packageVersion: 1.1
+  assetPath: Assets/GoogleGoMap/Scripts/GoogleStaticMap.cs
+  uploadId: 168379

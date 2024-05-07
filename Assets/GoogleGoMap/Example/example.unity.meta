@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4526a38f9dcb8418fb64ea423c44732d
+timeCreated: 1488830543
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 78642
+  packageName: Google Go Maps - For Location-based Games
+  packageVersion: 1.1
+  assetPath: Assets/GoogleGoMap/Example/example.unity
+  uploadId: 168379

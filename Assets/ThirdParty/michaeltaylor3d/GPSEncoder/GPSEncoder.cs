@@ -1,6 +1,7 @@
 //Copyright 2013 MichaelTaylor3D
 //www.michaeltaylor3d.com
 
+using System;
 using UnityEngine;
 
 public sealed class GPSEncoder {
@@ -9,19 +10,33 @@ public sealed class GPSEncoder {
 	//////-------------Public API--------------//////
 	/////////////////////////////////////////////////
 	
-	/// <summary>
-	/// Convert UCS (X,Y,Z) coordinates to GPS (Lat, Lon) coordinates
-	/// </summary>
-	/// <returns>
-	/// Returns Vector2 containing Latitude and Longitude
-	/// </returns>
-	/// <param name='position'>
-	/// (X,Y,Z) Position Parameter
-	/// </param>
-	public static Vector2 USCToGPS(Vector3 position)
-	{
-		return GetInstance().ConvertUCStoGPS(position);
-	}
+	///// <summary>
+	///// Convert UCS (X,Y,Z) coordinates to GPS (Lat, Lon) coordinates
+	///// </summary>
+	///// <returns>
+	///// Returns Vector2 containing Latitude and Longitude
+	///// </returns>
+	///// <param name='position'>
+	///// (X,Y,Z) Position Parameter
+	///// </param>
+	//public static Vector2 USCToGPS(double x, double y)
+	//{
+	//	return GetInstance().ConvertUCStoGPS(position);
+	//}
+	
+	///// <summary>
+	///// Convert GPS (Lat, Lon) coordinates to UCS (X,Y,Z) coordinates
+	///// </summary>
+	///// <returns>
+	///// Returns a Vector3 containing (X, Y, Z)
+	///// </returns>
+	///// <param name='gps'>
+	///// (Lat, Lon) as Vector2
+	///// </param>
+	//public static Vector3 GPSToUCS(double x, double y)
+	//{
+	//	return GetInstance().ConvertGPStoUCS(gps);
+	//}
 	
 	/// <summary>
 	/// Convert GPS (Lat, Lon) coordinates to UCS (X,Y,Z) coordinates
@@ -29,23 +44,9 @@ public sealed class GPSEncoder {
 	/// <returns>
 	/// Returns a Vector3 containing (X, Y, Z)
 	/// </returns>
-	/// <param name='gps'>
-	/// (Lat, Lon) as Vector2
-	/// </param>
-	public static Vector3 GPSToUCS(Vector2 gps)
+	public static (double x, double y) GPSToUCS(double latitude, double longitude)
 	{
-		return GetInstance().ConvertGPStoUCS(gps);
-	}
-	
-	/// <summary>
-	/// Convert GPS (Lat, Lon) coordinates to UCS (X,Y,Z) coordinates
-	/// </summary>
-	/// <returns>
-	/// Returns a Vector3 containing (X, Y, Z)
-	/// </returns>
-	public static Vector3 GPSToUCS(float latitude, float longitude)
-	{
-		return GetInstance().ConvertGPStoUCS(new Vector2(latitude,longitude));
+		return GetInstance().ConvertGPStoUCS((latitude,longitude));
 	}
 	
 	/// <summary>
@@ -55,7 +56,7 @@ public sealed class GPSEncoder {
 	/// <param name='localOrigin'>
 	/// Referance point.
 	/// </param>
-	public static void SetLocalOrigin(Vector2 localOrigin)
+	public static void SetLocalOrigin((double x, double y) localOrigin)
 	{
 		GetInstance()._localOrigin = localOrigin;
 	}
@@ -83,48 +84,48 @@ public sealed class GPSEncoder {
 	#endregion
 	
 	#region Instance Variables
-	private Vector2 _localOrigin = Vector2.zero;
-	private float _LatOrigin { get{ return _localOrigin.x; }}	
-	private float _LonOrigin { get{ return _localOrigin.y; }}
+	private (double x, double y) _localOrigin = (0.0,0.0);
+	private double _LatOrigin { get{ return _localOrigin.x; }}	
+	private double _LonOrigin { get{ return _localOrigin.y; }}
 
-	private float metersPerLat;
-	private float metersPerLon;
+	private double metersPerLat;
+	private double metersPerLon;
 	#endregion
 	
 	#region Instance Functions
-	private void FindMetersPerLat(float lat) // Compute lengths of degrees
+	private void FindMetersPerLat(double lat) // Compute lengths of degrees
 	{
 	    // Set up "Constants"
-	    float m1 = 111132.92f;    // latitude calculation term 1
-	    float m2 = -559.82f;        // latitude calculation term 2
-	    float m3 = 1.175f;      // latitude calculation term 3
-	    float m4 = -0.0023f;        // latitude calculation term 4
-	    float p1 = 111412.84f;    // longitude calculation term 1
-	    float p2 = -93.5f;      // longitude calculation term 2
-	    float p3 = 0.118f;      // longitude calculation term 3
+	    double m1 = 111132.92f;    // latitude calculation term 1
+	    double m2 = -559.82f;        // latitude calculation term 2
+	    double m3 = 1.175f;      // latitude calculation term 3
+	    double m4 = -0.0023f;        // latitude calculation term 4
+	    double p1 = 111412.84f;    // longitude calculation term 1
+	    double p2 = -93.5f;      // longitude calculation term 2
+	    double p3 = 0.118f;      // longitude calculation term 3
 	    
-	    lat = lat * Mathf.Deg2Rad;
+	    lat = lat * (Math.PI / 180.0);
 	
 	    // Calculate the length of a degree of latitude and longitude in meters
-	    metersPerLat = m1 + (m2 * Mathf.Cos(2 * (float)lat)) + (m3 * Mathf.Cos(4 * (float)lat)) + (m4 * Mathf.Cos(6 * (float)lat));
-	    metersPerLon = (p1 * Mathf.Cos((float)lat)) + (p2 * Mathf.Cos(3 * (float)lat)) + (p3 * Mathf.Cos(5 * (float)lat));	   
+	    metersPerLat = m1 + (m2 * Math.Cos(2 * (double)lat)) + (m3 * Math.Cos(4 * (double)lat)) + (m4 * Math.Cos(6 * (double)lat));
+	    metersPerLon = (p1 * Math.Cos((double)lat)) + (p2 * Math.Cos(3 * (double)lat)) + (p3 * Math.Cos(5 * (double)lat));	   
 	}
 
-	private Vector3 ConvertGPStoUCS(Vector2 gps)  
+	private (double x, double y) ConvertGPStoUCS((double x, double y) gps)  
 	{
 		FindMetersPerLat(_LatOrigin);
-		float xPosition  = metersPerLat * (gps.x - _LatOrigin); //Calc current lat
-		float yPosition  = metersPerLon * (gps.y - _LonOrigin); //Calc current lat
-		return new Vector3((float)xPosition, (float)yPosition, 0);
+		double xPosition  = metersPerLat * (gps.x - _LatOrigin); //Calc current lat
+		double yPosition  = metersPerLon * (gps.y - _LonOrigin); //Calc current lat
+		return ((double)xPosition, (double)yPosition);
 	}
 	
-	private Vector2 ConvertUCStoGPS(Vector3 position)
-	{
-		FindMetersPerLat(_LatOrigin);
-		Vector2 geoLocation = new Vector2(0,0);
-		geoLocation.x = (_LatOrigin + (position.z)/metersPerLat); //Calc current lat
-		geoLocation.y = (_LonOrigin + (position.x)/metersPerLon); //Calc current lon
-		return geoLocation;
-	}
+	//private Vector2 ConvertUCStoGPS((double x, double y) position)
+	//{
+	//	FindMetersPerLat(_LatOrigin);
+	//	Vector2 geoLocation = new Vector2(0,0);
+	//	geoLocation.x = (_LatOrigin + (position.z)/metersPerLat); //Calc current lat
+	//	geoLocation.y = (_LonOrigin + (position.x)/metersPerLon); //Calc current lon
+	//	return geoLocation;
+	//}
 	#endregion
 }
