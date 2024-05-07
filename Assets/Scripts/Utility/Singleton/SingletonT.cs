@@ -58,7 +58,7 @@ namespace SingletonT
         /// <exception cref="Singleton{T}.MultipleSingletonInSceneException"></exception>
         private static T FindSingleton()
         {
-            var singletons = FindObjectsOfType<T>();
+            var singletons = FindObjectsByType<T>(sortMode: FindObjectsSortMode.None);
 
             return singletons.Length switch
             {

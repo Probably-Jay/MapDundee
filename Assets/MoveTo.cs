@@ -18,8 +18,11 @@ public class MoveTo : MonoBehaviour
     {
         var geoCordFromUs = new GeoCord(offset.x, offset.y);
 
-       // transform.position =  geoCordFromUs.ToWorldSpace();
-       var pos = GeoCord.GeoCordToWorldSpace(geoCordFromUs, b);
+        // transform.position =  geoCordFromUs.ToWorldSpace();
+
+        var pos = GPSEncoder.GPSToUCS(offset);
+
+       //var pos = GeoCord.GeoCordToWorldSpace(geoCordFromUs, b);
        transform.position =  new Vector3(pos.x, pos.y, 0);
     }
 }

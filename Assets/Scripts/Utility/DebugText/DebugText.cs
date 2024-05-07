@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using SingletonT;
 using TMPro;
-using UnityEngine;
-using BetterComponentHandling.CleanAssignment;
+
 
 namespace CustomTools
 {
