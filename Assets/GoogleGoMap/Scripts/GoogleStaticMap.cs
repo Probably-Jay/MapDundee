@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.IO;
+using UnityEngine.AdaptivePerformance.Provider;
 
 public class GoogleStaticMap : MonoBehaviour {
 
@@ -137,8 +138,13 @@ public class GoogleStaticMap : MonoBehaviour {
 			yield return www;
 
 			Renderer renderer = GetComponent<Renderer> ();
-			// assign texture
-			renderer.material.mainTexture = www.textureNonReadable;
+            // assign texture
+            var textureNonReadable = www.texture;
+			var path = Path.Combine(Application.persistentDataPath, "Map");
+			File.WriteAllBytes(path, textureNonReadable.EncodeToPNG());
+			Debug.LogWarning(path);
+
+            renderer.material.mainTexture = textureNonReadable;
 			isDrawn = true;
 		} else {
 			Debug.Log ("Too many map requests. Restart the game.");
